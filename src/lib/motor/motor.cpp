@@ -6,5 +6,7 @@
     - speed: 0 to 255 ---> 0 = stop / 255 = fast
 */
 void Motor::drive(direction turnDirection, int speed) {
-    
+    if (turnDirection == direction::clockwise) {
+        Motor::pin->write(speed);
+    }
 }
