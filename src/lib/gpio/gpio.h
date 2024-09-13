@@ -5,11 +5,14 @@
 
 class GPIOPin {
     public:
-    GPIOPin(int num, int mode) : pin(num), mode(mode) {
+    GPIOPin(uint8_t num, uint8_t mode) : pin(num), mode(mode) {
         pinMode(pin, mode);
     };
+
+    void write(int val);
+
     private:
-        int pin;
+        uint8_t pin;
         uint8_t mode;
 };
 
