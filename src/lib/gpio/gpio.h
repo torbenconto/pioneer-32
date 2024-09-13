@@ -11,6 +11,10 @@ class GPIOPin {
 
     void write(int val);
 
+    // Getters
+    uint8_t get_pin();
+    uint8_t get_mode();
+
     private:
         uint8_t pin;
         uint8_t mode;
