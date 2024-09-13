@@ -1,12 +1,13 @@
 #include <Arduino.h>
 #include "gpio.h"
+#include "motor.h"
 #include "pins.h"
 
 
 /*
   Pin initializations, see lib/gpio for GPIOPin class
   Definitons are handled in include/pins.h
-
+h
   Driver used: https://www.sparkfun.com/products/14450
   Pinout: https://learn.sparkfun.com/tutorials/tb6612fng-hookup-guide/all
 */

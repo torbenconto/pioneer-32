@@ -5,7 +5,7 @@
 
 class Motor {
     public: 
-        Motor(GPIOPin *pin) : pin(pin) {};
+        Motor(GPIOPin *pinA, GPIOPin *pinB, GPIOPin *pwm ) : pinA(pinA), pinB(pinB), pwm(pwm) {};
 
         enum direction {
             clockwise,
@@ -14,7 +14,9 @@ class Motor {
         
         void drive(direction d, int speed);
     private:
-        GPIOPin *pin;
+        GPIOPin *pinA;
+        GPIOPin *pinB;
+        GPIOPin *pwm;
 
 }
 

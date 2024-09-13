@@ -6,7 +6,16 @@
     - speed: 0 to 255 ---> 0 = stop / 255 = fast
 */
 void Motor::drive(direction turnDirection, int speed) {
+    // TODO: fix this horrific code
     if (turnDirection == direction::clockwise) {
-        Motor::pin->write(speed);
+        Motor::pinA->write(HIGH);
+        Motor::pinB->write(LOW);
     }
+
+    if (turnDirection == direction::counterclockwise) {
+        Motor::pinA->write(LOW);
+        Motor::pinB->write(HIGH);
+    }
+
+    Motor::pwm->write(speed);
 }
