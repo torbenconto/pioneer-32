@@ -13,6 +13,7 @@ class Motor {
         Motor(GPIOPin* pinA, GPIOPin* pinB, GPIOPin* pwm) : _pinA(pinA), _pinB(pinB), _pwm(pwm) {};
         
         void drive(direction turnDirection, int speed);
+        void stop();
     private:
         // Store references because its a class not like a uint8_t or something that can be copied without a large performance impact
         GPIOPin* _pinA;
