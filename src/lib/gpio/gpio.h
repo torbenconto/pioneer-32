@@ -5,19 +5,16 @@
 
 class GPIOPin {
     public:
-    GPIOPin(uint8_t num, uint8_t mode) : pin(num), mode(mode) {
+    GPIOPin(uint8_t pin, uint8_t mode) : _pin(pin), _mode(mode) {
         pinMode(pin, mode);
     };
 
-    void write(int val);
-
-    // Getters
-    uint8_t get_pin();
-    uint8_t get_mode();
+    void writeAnalog(int val);
+    void writeDigital(uint8_t val);
 
     private:
-        uint8_t pin;
-        uint8_t mode;
+        uint8_t _pin;
+        uint8_t _mode;
 };
 
 #endif // GPIO_H

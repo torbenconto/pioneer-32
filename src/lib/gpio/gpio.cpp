@@ -1,6 +1,12 @@
 #include "gpio.h"
+#include <Arduino.h>
 
-// write analogWrites int val to GPIOPin::pin
-void GPIOPin::write(int val) {
-    analogWrite(GPIOPin::pin, val);
+// writeAnalog analogWrites int val to GPIOPin::_pin
+void GPIOPin::writeAnalog(int val) {
+    analogWrite(_pin, val);
 };
+
+// writeDigital digitalWrites uint8_t val to GPIOPin::_pin
+void GPIOPin::writeDigital(uint8_t val) {
+    digitalWrite(_pin, val);
+}

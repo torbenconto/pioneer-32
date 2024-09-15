@@ -3,21 +3,22 @@
 
 #include "gpio.h"
 
+enum direction {
+    clockwise,
+    counterclockwise
+};
+
 class Motor {
     public: 
-        Motor(GPIOPin *pinA, GPIOPin *pinB, GPIOPin *pwm ) : pinA(pinA), pinB(pinB), pwm(pwm) {};
-
-        enum direction {
-            clockwise,
-            counterclockwise
-        };
+        Motor(GPIOPin* pinA, GPIOPin* pinB, GPIOPin* pwm) : _pinA(pinA), _pinB(pinB), _pwm(pwm) {};
         
         void drive(direction d, int speed);
     private:
-        GPIOPin *pinA;
-        GPIOPin *pinB;
-        GPIOPin *pwm;
+        // Store references because its a class not like a uint8_t or something that can be copied without a large performance impact
+        GPIOPin* _pinA;
+        GPIOPin* _pinB;
+        GPIOPin* _pwm;
 
-}
+};
 
 #endif // MOTOR_H

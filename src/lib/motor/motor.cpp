@@ -6,16 +6,26 @@
     - speed: 0 to 255 ---> 0 = stop / 255 = fast
 */
 void Motor::drive(direction turnDirection, int speed) {
-    // TODO: fix this horrific code
-    if (turnDirection == direction::clockwise) {
-        Motor::pinA->write(HIGH);
-        Motor::pinB->write(LOW);
+    // Clamp speed value
+    speed = max(0, min(255, speed));  
+
+    // Control direction based on turnDirection (obviously. Also why is this a switch? There are only two turn directions)
+    switch (turnDirection) {
+        case direction::clockwise:
+            _pinA->writeDigital(HIGH);
+            _pinB->writeDigital(LOW);
+            break;
+
+        case direction::counterclockwise:
+            _pinA->writeDigital(LOW);
+            _pinB->writeDigital(HIGH);
+            break;
+
+        default:
+            // This should never ever be reached. Why is it here? I don't know.
+            return;
     }
 
-    if (turnDirection == direction::counterclockwise) {
-        Motor::pinA->write(LOW);
-        Motor::pinB->write(HIGH);
-    }
-
-    Motor::pwm->write(speed);
+    // Set motor speed with PWM
+    _pwm->writeAnalog(speed);
 }
