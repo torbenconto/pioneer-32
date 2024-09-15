@@ -1,13 +1,13 @@
 #include <Arduino.h>
 #include "gpio.h"
+#include "motor.h"
 #include "pins.h"
-
 
 /*
   Pin initializations, see lib/gpio for GPIOPin class
   Definitons are handled in include/pins.h
 
-  Driver used: https://www.sparkfun.com/products/14450
+  Driver module used: https://www.sparkfun.com/products/14450
   Pinout: https://learn.sparkfun.com/tutorials/tb6612fng-hookup-guide/all
 */
 
@@ -32,8 +32,12 @@ GPIOPin p_PWMB(PWMB, OUTPUT);
 */
 GPIOPin p_STBY(STBY, OUTPUT);
 
+// MotorA instance
+Motor motorA(&p_AIN1, &p_AIN2, &p_PWMA);
 
 void setup() {
+  // Disable standby
+  p_STBY.writeDigital(HIGH);
 }
 
 void loop() {
