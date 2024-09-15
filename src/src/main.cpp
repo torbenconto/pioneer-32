@@ -41,4 +41,8 @@ void setup() {
 }
 
 void loop() {
+  motorA.drive(clockwise, 255);
+  delay(1000);
+  motorA.drive(clockwise, 0);
+  delay(1000);
 }
