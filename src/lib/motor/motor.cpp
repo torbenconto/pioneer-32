@@ -29,3 +29,8 @@ void Motor::drive(direction turnDirection, int speed) {
     // Set motor speed with PWM
     _pwm->writeAnalog(speed);
 }
+// Turns off both PinA and PinB to stop the motor
+void Motor::stop(){
+    _pinA-> writeDigital(LOW);
+    _pinB-> writeDigital(LOW);
+}
