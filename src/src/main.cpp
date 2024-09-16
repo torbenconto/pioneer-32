@@ -34,6 +34,7 @@ GPIOPin p_STBY(STBY, OUTPUT);
 
 // MotorA instance
 Motor motorA(&p_AIN1, &p_AIN2, &p_PWMA);
+Motor motorB(&p_BIN1, &p_BIN2, &p_PWMB);
 
 void setup() {
   // Disable standby
