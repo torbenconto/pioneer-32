@@ -1,4 +1,4 @@
-// Jacked from https://github.com/asukiaaa
+// credit to https://github.com/asukiaaa this is entirely based on one of his libraries for xbox controller handling
 #pragma once
 
 #include <NimBLEDevice.h>
