@@ -1,13 +1,18 @@
+// Jacked from https://github.com/asukiaaa
 #pragma once
 
 #include <NimBLEDevice.h>
 #include <XboxControllerNotificationParser.h>
+#include "report_builder.h"
 
 static NimBLEUUID uuidServiceHid("1812");
-static const uint16_t controllerAppearance = 964;
+static NimBLEUUID uuidCharaReport("2a4d");
+static NimBLEUUID uuidServiceBattery("180f");
 
 static NimBLEAdvertisedDevice* advDevice;
 static NimBLEClient* pConnectedClient = nullptr;
+
+static const uint16_t controllerAppearance = 964;
 
 enum class ConnectionState : uint8_t {
   Connected = 0,
@@ -28,7 +33,7 @@ class ClientCallbacks : public NimBLEClientCallbacks {
   void onDisconnect(NimBLEClient* pClient) override {
     *pConnectionState = ConnectionState::Scanning;
     pConnectedClient = nullptr;
-  } 
+  }
 
   uint32_t onPassKeyRequest() override { return 0; }
   bool onConfirmPIN(uint32_t pass_key) override { return true; }
@@ -70,10 +75,37 @@ class Controller {
     clientCBs = new ClientCallbacks(&connectionState);
   }
 
+  AdvertisedDeviceCallbacks* advDeviceCBs;
+  ClientCallbacks* clientCBs;
+  uint8_t battery = 0;
+  static const int deviceAddressLen = 6;
+  uint8_t deviceAddressArr[deviceAddressLen];
+
   void begin() {
     NimBLEDevice::init("");
     NimBLEDevice::setOwnAddrType(BLE_OWN_ADDR_PUBLIC);
     NimBLEDevice::setSecurityAuth(true, false, false);
+  }
+
+  void writeHIDReport(uint8_t* dataArr, size_t dataLen) {
+    if (pConnectedClient == nullptr) return;
+    NimBLEClient* pClient = pConnectedClient;
+    auto pService = pClient->getService(uuidServiceHid);
+    for (auto pChara : *pService->getCharacteristics()) {
+      if (pChara->canWrite()) {
+        pChara->writeValue(dataArr, dataLen, false);
+      }
+    }
+  }
+
+  void writeHIDReport(const ReportBase& repo) {
+    writeHIDReport((uint8_t*)repo.arr8t, repo.arr8tLen);
+  }
+
+  void writeHIDReport(const ReportBeforeUnion& repoBeforeUnion) {
+    ReportBase repo;
+    repo.v = repoBeforeUnion;
+    writeHIDReport((uint8_t*)repo.arr8t, repo.arr8tLen);
   }
 
   void onLoop() {
@@ -123,11 +155,6 @@ class Controller {
   uint8_t getCountFailedConnection() { return countFailedConnection; }
 
  private:
-  AdvertisedDeviceCallbacks* advDeviceCBs;
-  ClientCallbacks* clientCBs;
-  static const int deviceAddressLen = 6;
-  uint8_t deviceAddressArr[deviceAddressLen];
-  
   ConnectionState connectionState = ConnectionState::Scanning;
   uint32_t scanTime = 4;
   uint8_t countFailedConnection = 0;
@@ -168,8 +195,10 @@ class Controller {
   bool afterConnect(NimBLEClient* pClient) {
     memcpy(deviceAddressArr, pClient->getPeerAddress().getNative(), deviceAddressLen);
     for (auto pService : *pClient->getServices(true)) {
-      if (pService->getUUID().equals(uuidServiceHid)) {
+      auto sUuid = pService->getUUID();
+      if (sUuid.equals(uuidServiceHid)) {
         for (auto pChara : *pService->getCharacteristics(true)) {
+          charaHandle(pChara);
           charaSubscribeNotification(pChara);
         }
       }
@@ -177,18 +206,28 @@ class Controller {
     return true;
   }
 
+  void charaHandle(NimBLERemoteCharacteristic* pChara) {
+    if (pChara->canRead()) {
+      auto str = pChara->readValue();
+    }
+  }
+
   void charaSubscribeNotification(NimBLERemoteCharacteristic* pChara) {
     if (pChara->canNotify()) {
-      pChara->subscribe(true, std::bind(&Controller::notifyCB, this, std::placeholders::_1,
-                                         std::placeholders::_2, std::placeholders::_3,
-                                         std::placeholders::_4), true);
+      if (pChara->subscribe(true, std::bind(&Controller::notifyCB, this, std::placeholders::_1,
+                                             std::placeholders::_2, std::placeholders::_3,
+                                             std::placeholders::_4), true)) {
+      }
     }
   }
 
   void notifyCB(NimBLERemoteCharacteristic* pRemoteCharacteristic, uint8_t* pData, size_t length,
                 bool isNotify) {
-    if (pRemoteCharacteristic->getRemoteService()->getUUID().equals(uuidServiceHid)) {
+    auto sUuid = pRemoteCharacteristic->getRemoteService()->getUUID();
+    if (sUuid.equals(uuidServiceHid)) {
       xboxNotif.update(pData, length);
+    } else if (sUuid.equals(uuidServiceBattery)) {
+      battery = pData[0];
     }
   }
 

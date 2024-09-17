@@ -6,20 +6,20 @@
 
 /*
   Pin initializations, see lib/gpio for GPIOPin class
-  Definitons are handled in include/pins.h
+  Definitions are handled in include/pins.h
 
   Driver module used: https://www.sparkfun.com/products/14450
   Pinout: https://learn.sparkfun.com/tutorials/tb6612fng-hookup-guide/all
 */
 
-// Directonal control pins for motor A
+// Directional control pins for motor A
 GPIOPin p_AIN1(AIN1, OUTPUT);
 GPIOPin p_AIN2(AIN2, OUTPUT);
 
 // PWM signal pin for speed control on motor A
 GPIOPin p_PWMA(PWMA, OUTPUT);
 
-// Directonal control pins for motor B
+// Directional control pins for motor B
 GPIOPin p_BIN1(BIN1, OUTPUT);
 GPIOPin p_BIN2(BIN2, OUTPUT);
 
@@ -33,11 +33,11 @@ GPIOPin p_PWMB(PWMB, OUTPUT);
 */
 GPIOPin p_STBY(STBY, OUTPUT);
 
-// MotorA instance
+// MotorA and MotorB instances
 Motor motorA(&p_AIN1, &p_AIN2, &p_PWMA);
 Motor motorB(&p_BIN1, &p_BIN2, &p_PWMB);
 
-// Controller params
+// Controller parameters
 const float JOYSTICK_MIDDLE = 0.5;
 const float DEAD_ZONE = 0.05; 
 
@@ -55,30 +55,35 @@ void loop() {
   xboxController.onLoop();
 
   if (xboxController.isConnected()) {
-    if (xboxController.isWaitingForFirstNotification()) {
+    if (!xboxController.isWaitingForFirstNotification()) {
       uint16_t joystickMax = XboxControllerNotificationParser::maxJoy; // Maximum possible joystick value
-      float joyLVert = (float)xboxController.xboxNotif.joyLVert / joystickMax; // Normalize joystick vertical position to [0, 1]
 
+      // Left joystick vertical position for motor A
+      float joyLVert = (float)xboxController.xboxNotif.joyLVert / joystickMax; // Normalize joystick value to [0, 1]
+
+      // Right joystick vertical position for motor B
+      float joyRVert = (float)xboxController.xboxNotif.joyRVert / joystickMax; // Normalize joystick value to [0, 1]
+      
+      // Motor A control logic (left joystick)
       if (joyLVert > JOYSTICK_MIDDLE + DEAD_ZONE) {
-          // Joystick is pushed beyond the positive dead zone
-          // Map joystick value to the motor speed range
-          // joyLVert - (JOYSTICK_MIDDLE + DEAD_ZONE) calculates how far the joystick is beyond the positive dead zone
-          // 1.0 - JOYSTICK_MIDDLE - DEAD_ZONE is the maximum range where the joystick can still affect the motor
-          float speed = (joyLVert - (JOYSTICK_MIDDLE + DEAD_ZONE)) / (1.0 - JOYSTICK_MIDDLE - DEAD_ZONE);
-          // Scale speed to motor range (0 to 255)
-          motorA.drive(clockwise, 255 * speed);
+        float speed = (joyLVert - (JOYSTICK_MIDDLE + DEAD_ZONE)) / (1.0 - JOYSTICK_MIDDLE - DEAD_ZONE);
+        motorA.drive(clockwise, 255 * speed);
       } else if (joyLVert < JOYSTICK_MIDDLE - DEAD_ZONE) {
-          // Joystick is pushed beyond the negative dead zone
-          // Map joystick value to the motor speed range
-          // (JOYSTICK_MIDDLE - DEAD_ZONE) - joyLVert calculates how far the joystick is below the negative dead zone
-          // JOYSTICK_MIDDLE - DEAD_ZONE is the maximum range where the joystick can still affect the motor
-          float speed = ((JOYSTICK_MIDDLE - DEAD_ZONE) - joyLVert) / (JOYSTICK_MIDDLE - DEAD_ZONE);
-          // Scale speed to motor range (0 to 255)
-          motorA.drive(counterclockwise, 255 * speed);
+        float speed = ((JOYSTICK_MIDDLE - DEAD_ZONE) - joyLVert) / (JOYSTICK_MIDDLE - DEAD_ZONE);
+        motorA.drive(counterclockwise, 255 * speed);
       } else {
-          // Joystick is within the dead zone
-          // No significant movement detected, so brake the motor
-          motorA.brake();
+        motorA.brake();
+      }
+
+      // Motor B control logic (right joystick)
+      if (joyRVert > JOYSTICK_MIDDLE + DEAD_ZONE) {
+        float speed = (joyRVert - (JOYSTICK_MIDDLE + DEAD_ZONE)) / (1.0 - JOYSTICK_MIDDLE - DEAD_ZONE);
+        motorB.drive(clockwise, 255 * speed);
+      } else if (joyRVert < JOYSTICK_MIDDLE - DEAD_ZONE) {
+        float speed = ((JOYSTICK_MIDDLE - DEAD_ZONE) - joyRVert) / (JOYSTICK_MIDDLE - DEAD_ZONE);
+        motorB.drive(counterclockwise, 255 * speed);
+      } else {
+        motorB.brake();
       }
     }
   } else {
@@ -86,4 +91,6 @@ void loop() {
       ESP.restart();
     }
   }
+  
+  delay(10);
 }
