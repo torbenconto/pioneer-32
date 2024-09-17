@@ -3,7 +3,6 @@
 
 #include <NimBLEDevice.h>
 #include <XboxControllerNotificationParser.h>
-#include "report_builder.h"
 
 static NimBLEUUID uuidServiceHid("1812");
 static NimBLEUUID uuidCharaReport("2a4d");
@@ -85,27 +84,6 @@ class Controller {
     NimBLEDevice::init("");
     NimBLEDevice::setOwnAddrType(BLE_OWN_ADDR_PUBLIC);
     NimBLEDevice::setSecurityAuth(true, false, false);
-  }
-
-  void writeHIDReport(uint8_t* dataArr, size_t dataLen) {
-    if (pConnectedClient == nullptr) return;
-    NimBLEClient* pClient = pConnectedClient;
-    auto pService = pClient->getService(uuidServiceHid);
-    for (auto pChara : *pService->getCharacteristics()) {
-      if (pChara->canWrite()) {
-        pChara->writeValue(dataArr, dataLen, false);
-      }
-    }
-  }
-
-  void writeHIDReport(const ReportBase& repo) {
-    writeHIDReport((uint8_t*)repo.arr8t, repo.arr8tLen);
-  }
-
-  void writeHIDReport(const ReportBeforeUnion& repoBeforeUnion) {
-    ReportBase repo;
-    repo.v = repoBeforeUnion;
-    writeHIDReport((uint8_t*)repo.arr8t, repo.arr8tLen);
   }
 
   void onLoop() {
