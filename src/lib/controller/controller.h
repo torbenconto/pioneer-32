@@ -5,8 +5,6 @@
 #include <XboxControllerNotificationParser.h>
 
 static NimBLEUUID uuidServiceHid("1812");
-static NimBLEUUID uuidCharaReport("2a4d");
-static NimBLEUUID uuidServiceBattery("180f");
 
 static NimBLEAdvertisedDevice* advDevice;
 static NimBLEClient* pConnectedClient = nullptr;
@@ -76,7 +74,6 @@ class Controller {
 
   AdvertisedDeviceCallbacks* advDeviceCBs;
   ClientCallbacks* clientCBs;
-  uint8_t battery = 0;
   static const int deviceAddressLen = 6;
   uint8_t deviceAddressArr[deviceAddressLen];
 
@@ -204,8 +201,6 @@ class Controller {
     auto sUuid = pRemoteCharacteristic->getRemoteService()->getUUID();
     if (sUuid.equals(uuidServiceHid)) {
       xboxNotif.update(pData, length);
-    } else if (sUuid.equals(uuidServiceBattery)) {
-      battery = pData[0];
     }
   }
 
