@@ -6,7 +6,6 @@
 #include "report_builder.h"
 
 static NimBLEUUID uuidServiceHid("1812");
-static NimBLEUUID uuidCharaReport("2a4d");
 
 static NimBLEAdvertisedDevice* advDevice;
 static NimBLEClient* pConnectedClient = nullptr;
