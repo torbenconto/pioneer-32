@@ -1,5 +1,4 @@
-#ifndef GPIO_H
-#define GPIO_H
+#pragma once
 
 #include <Arduino.h>
 
@@ -16,5 +15,3 @@ class GPIOPin {
         uint8_t _pin;
         uint8_t _mode;
 };
-
-#endif // GPIO_H

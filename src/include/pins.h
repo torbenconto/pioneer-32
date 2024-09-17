@@ -1,5 +1,4 @@
-#ifndef PINS_H
-#define PINS_H
+#pragma once
 
 #define AIN1 14
 #define AIN2 27
@@ -10,5 +9,3 @@
 #define PWMB 32
 
 #define STBY 26
-
-#endif // PINS_H

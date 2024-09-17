@@ -1,5 +1,4 @@
-#ifndef MOTOR_H
-#define MOTOR_H
+#pragma once
 
 #include "gpio.h"
 
@@ -22,5 +21,3 @@ class Motor {
         GPIOPin* _pwm;
 
 };
-
-#endif // MOTOR_H
