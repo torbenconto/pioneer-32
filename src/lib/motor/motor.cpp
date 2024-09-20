@@ -12,13 +12,13 @@ void Motor::drive(direction turnDirection, int speed) {
     // Control direction based on turnDirection (obviously. Also why is this a switch? There are only two turn directions)
     switch (turnDirection) {
         case direction::clockwise:
-            _pinA->writeDigital(HIGH);
-            _pinB->writeDigital(LOW);
+            _pinA.writeDigital(HIGH);
+            _pinB.writeDigital(LOW);
             break;
 
         case direction::counterclockwise:
-            _pinA->writeDigital(LOW);
-            _pinB->writeDigital(HIGH);
+            _pinA.writeDigital(LOW);
+            _pinB.writeDigital(HIGH);
             break;
 
         default:
@@ -27,16 +27,16 @@ void Motor::drive(direction turnDirection, int speed) {
     }
 
     // Set motor speed with PWM
-    _pwm->writeAnalog(speed);
+    _PWM.writeAnalog(speed);
 }
 
 // Turns off both PinA and PinB to stop the motor
 void Motor::stop() {
-    _pinA->writeDigital(LOW);
-    _pinB->writeDigital(LOW);
+    _pinA.writeDigital(LOW);
+    _pinB.writeDigital(LOW);
 }
 
 // Directly writes 0 to the PWM pin to short brake
 void Motor::brake() {
-    _pwm->writeAnalog(0);
+    _PWM.writeAnalog(0);
 }
