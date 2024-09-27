@@ -36,11 +36,16 @@ void loop() {
     if (!xboxController.isWaitingForFirstNotification()) {
       uint16_t joystickMax = XboxControllerNotificationParser::maxJoy; // Maximum possible joystick value
 
-      // Left joystick vertical position for motor A
       float joyLVert = (float)xboxController.xboxNotif.joyLVert / joystickMax; // Normalize joystick value to [0, 1]
 
-      // Right joystick vertical position for motor B
       float joyRVert = (float)xboxController.xboxNotif.joyRVert / joystickMax; // Normalize joystick value to [0, 1]
+
+      float rTrigger = (float)xboxController.xboxNotif.trigRT / 1024; // Normalize trigger value to [0, 1]
+
+      float lTrigger = (float)xboxController.xboxNotif.trigLT / 1024; // Normalize trigger value to [0, 1]
+
+      bool rb = xboxController.xboxNotif.btnRB;
+      bool lb = xboxController.xboxNotif.btnLB;
       
       // Motor A control logic (left joystick)
       if (joyLVert > JOYSTICK_MIDDLE + DEAD_ZONE) {
@@ -62,6 +67,23 @@ void loop() {
         WheelMotorB.drive(counterclockwise, 255 * speed);
       } else {
         WheelMotorB.brake();
+      }
+
+      // Triggers control ClawMotorA (move arm up and down)
+      if (rTrigger > 0) {
+          // Rtrigger moves up
+          ClawMotorA.drive(clockwise, 255 * rTrigger);
+      } else if (lTrigger > 0) {
+          ClawMotorA.drive(counterclockwise, 255 * lTrigger);
+      } else {
+          ClawMotorA.brake();
+      }
+
+      // Bumpers control ClawMotorB (open and close jaws)
+      if (rb) {
+        ClawMotorB.drive(clockwise, 255);
+      } else if (lb) {
+        ClawMotorB.drive(counterclockwise, 255);
       }
     }
   } else {
